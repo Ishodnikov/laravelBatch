@@ -63,18 +63,18 @@ class Batch implements InterfaceBatch
                 if ($field !== $index) {
                     $finalField = $raw ? Common::mysql_escape($val[$field]) : '"' . Common::mysql_escape($val[$field]) . '"';
                     $value = (is_null($val[$field]) ? 'NULL' : $finalField);
-                    $final[$field][] = 'WHEN \'' . $index . '\' = "' . $val[$index] . '" THEN ' . $value . ' ';
+                    $final[$field][] = 'WHEN ' . $index . ' = "' . $val[$index] . '" THEN ' . $value . ' ';
                 }
             }
         }
 
         $cases = '';
         foreach ($final as $k => $v) {
-            $cases .= '\'' . $k . '\' = (CASE ' . implode("\n", $v) . "\n"
-                . 'ELSE \'' . $k . '\' END), ';
+            $cases .= '' . $k . ' = (CASE ' . implode("\n", $v) . "\n"
+                . 'ELSE ' . $k . ' END), ';
         }
 
-        $query = "UPDATE \'" . $this->getFullTableName($table) . "\' SET " . substr($cases, 0, -2) . " WHERE \'$index\' IN(" . '"' . implode('","', $ids) . '"' . ");";
+        $query = "UPDATE " . $this->getFullTableName($table) . " SET " . substr($cases, 0, -2) . " WHERE $index IN(" . '"' . implode('","', $ids) . '"' . ");";
 
         return $this->db->connection($this->getConnectionName($table))->update($query);
     }
@@ -128,17 +128,17 @@ class Batch implements InterfaceBatch
                 if ($field !== $index || $field !== $index2 ) {
                     $finalField = $raw ? Common::mysql_escape($val[$field]) : '"' . Common::mysql_escape($val[$field]) . '"';
                     $value = (is_null($val[$field]) ? 'NULL' : $finalField);
-                    $final[$field][] = 'WHEN (\'' . $index . '\' = "' . Common::mysql_escape($val[$index]) .'" AND \''. $index2 . '\' = "' . $val[$index2] .'") THEN ' . $value . ' ';
+                    $final[$field][] = 'WHEN (' . $index . ' = "' . Common::mysql_escape($val[$index]) .'" AND '. $index2 . ' = "' . $val[$index2] .'") THEN ' . $value . ' ';
                 }
             }
         }
 
         $cases = '';
         foreach ($final as $k => $v) {
-            $cases .= '\'' . $k . '\' = (CASE ' . implode("\n", $v) . "\n"
-                . 'ELSE \'' . $k . '\' END), ';
+            $cases .= '' . $k . ' = (CASE ' . implode("\n", $v) . "\n"
+                . 'ELSE ' . $k . ' END), ';
         }
-        $query = "UPDATE \'" . $this->getFullTableName($table) . "\' SET " . substr($cases, 0, -2) . " WHERE \'$index\' IN(" . '"' . implode('","', $ids) . '")' .  " AND \'$index2\' IN(" . '"' . implode('","', $ids2) . '"' ." );";
+        $query = "UPDATE " . $this->getFullTableName($table) . " SET " . substr($cases, 0, -2) . " WHERE $index IN(" . '"' . implode('","', $ids) . '")' .  " AND $index2 IN(" . '"' . implode('","', $ids2) . '"' ." );";
 
         return $this->db->connection($this->getConnectionName($table))->update($query);
     }
@@ -209,7 +209,7 @@ class Batch implements InterfaceBatch
         $values = array_chunk($values, $totalChunk, true);
 
         foreach ($columns as $key => $column) {
-            $columns[$key] = "\'" . Common::mysql_escape($column) . "\'";
+            $columns[$key] = "" . Common::mysql_escape($column) . "";
         }
 
         foreach ($values as $value) {
@@ -227,7 +227,7 @@ class Batch implements InterfaceBatch
 
             $ignoreStmt =  $insertIgnore ? ' IGNORE ' : '';
 
-            $query[] = "INSERT ".$ignoreStmt." INTO \'" . $this->getFullTableName($table) . "\' (" . implode(',', $columns) . ") VALUES $valueString;";
+            $query[] = "INSERT ".$ignoreStmt." INTO " . $this->getFullTableName($table) . " (" . implode(',', $columns) . ") VALUES $valueString;";
         }
 
         if (count($query)) {
